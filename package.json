@@ -1,0 +1,27 @@
+{
+  "name": "learn-data-mapping",
+  "version": "1.0.0",
+  "description": "Learn how to map data from one format to another (Extract - Transform - Load)",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwyl/learn-data-mapping.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dwyl/learn-data-mapping/issues"
+  },
+  "homepage": "https://github.com/dwyl/learn-data-mapping#readme",
+  "devDependencies": {
+    "env2": "^2.1.1",
+    "goodparts": "^1.1.1",
+    "tape": "^4.6.2"
+  }
+}
