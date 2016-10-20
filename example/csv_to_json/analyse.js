@@ -18,6 +18,7 @@ outputFilename = './transformed_data.json';
 
 data = fs.readFileSync(inputFilename).toString();
 
+
 // converts CSV string to an array of arrays
 function csvToArray (dataString, delimiter) {
   console.log('CSV -------> ARRAY');
@@ -27,13 +28,21 @@ function csvToArray (dataString, delimiter) {
   delimit = delimiter || ',';
   // converts data string --> array of strings
   items = dataString.split(delimit);
-
   arrayedItems = items.map(function (item) {
     // converts array of strings --> array of arrays
-    var newItem = item.split(',');
+    var newItem = item
+      .replace(/""|_/g, 'toBeNulled')
+      .replace(/"|_/g, '')
+      .replace(/\r|_/g, '')
+      .replace(/, |_/g, ' ')
+      .replace(/ ,|_/g, ' ')
+      .replace(/,,|_/g, ',')
+      .split('","')
+      ;
 
-    return newItem;
+    return newItem[0].split(',');
   });
+
   dataArray = arrayedItems.map(function (arrayedItem) {
     // removes excess quotes for item strings within nested arrays
     destringedItem = arrayedItem.map(function (innerArrayedItem) {
@@ -54,7 +63,7 @@ function removeClosedSchools (schoolsData) {
   var schoolsOpen = schoolsData.filter(function (schoolData) {
     return schoolData[6] !== 'Closed';
   });
-  // console.log(schoolsOpen.length);
+
   return schoolsOpen;
 }
 
@@ -62,16 +71,20 @@ openSchools = removeClosedSchools(schools);
 
 // converts values to null if they meet a given criteria
 function nullify (schoolsOpen) {
+  var nullifiedData, dataItems;
+
   console.log('NULLIFY DATA');
   console.log('- - - - - - - - - - - -');
-  var nullifiedData, dataItems;
 
   nullifiedData = schoolsOpen.map(function (dataBlock) {
     dataItems = dataBlock.map(function (dataBlockItem) {
       if (dataBlockItem === 'null'
         || dataBlockItem === ''
         || dataBlockItem === 'Not applicable'
+        || dataBlockItem === 'Not Applicable'
         || dataBlockItem === 'Does not apply'
+        || dataBlockItem === 'toBeNulled'
+        || dataBlockItem === '-'
       ) {
         return null;
       }
@@ -89,11 +102,12 @@ nullifiedFields = nullify(openSchools);
 
 // creates an object with field name keys
 function buildFieldsObject (nullifiedData) {
-  console.log('BUILDING FIELDS OBJECT');
-  console.log('- - - - - - - - - - - -');
   var values = {};
   var columnNames = nullifiedData[0];
   var matrix = nullifiedData.slice(1, nullifiedData.length);
+
+  console.log('BUILDING FIELDS OBJECT');
+  console.log('- - - - - - - - - - - -');
 
   columnNames.forEach(function (field, index) {
     values[field] = matrix.map(function (row) {
@@ -107,16 +121,16 @@ function buildFieldsObject (nullifiedData) {
 fieldsObject = buildFieldsObject(nullifiedFields);
 
 function parseValues (valuesArray) {
-  console.log('MAKING UNIQUE ARRAY');
-  console.log('- - - - - - - - - - - -');
   var uniqueArray = [];
   var nullCount = 0;
+
+  console.log('MAKING UNIQUE ARRAY');
+  console.log('- - - - - - - - - - - -');
 
   valuesArray.forEach(function (elem) {
     if (elem === null) {
       nullCount++;
     } else if (uniqueArray.indexOf(elem) === -1) {
-      // console.log(elem);
       uniqueArray.push(elem);
     }
   });
@@ -127,14 +141,14 @@ function parseValues (valuesArray) {
   };
 }
 function determineFieldTypes (fieldsObj) {
+  var fieldTypesObject = {};
+  var fields = Object.keys(fieldsObj);
+
   console.log('DETERMINING FIELD TYPES');
   console.log('- - - - - - - - - - - -');
-  var fieldTypesObject = {};
-  var fields = [Object.keys(fieldsObj)[5]];
 
   fields.forEach(function (field) {
     var fieldValues = fieldsObj[field];
-    console.log(field, fieldValues.length);
     var parsedData = parseValues(fieldValues);
     var uniqueArray = parsedData.uniqueArray;
     var nullCount = parsedData.nullCount;
@@ -148,7 +162,7 @@ function determineFieldTypes (fieldsObj) {
     } else if (uniqueArray.length + nullCount > fieldValues.length - 2000) {
       fieldTypesObject[field] = { fieldType: 'UNIQUE OR NULL' };
     } else if (uniqueArray.length < 100) {
-      // console.log(uniqueArray);
+      console.log('SMALL ENUM', uniqueArray);
       fieldTypesObject[field] = { fieldType: 'SMALL ENUM' };
     } else if (uniqueArray.length < 1000) {
       fieldTypesObject[field] = { fieldType: 'BIG ENUM' };
