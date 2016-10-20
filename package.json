@@ -23,5 +23,8 @@
     "env2": "^2.1.1",
     "goodparts": "^1.1.1",
     "tape": "^4.6.2"
+  },
+  "dependencies": {
+    "csvtojson": "^1.0.3"
   }
 }

@@ -41,3 +41,4 @@ jspm_packages
 
 # School data
 example/csv_to_json/school_data.csv
+example/csv_to_json/dummy_data.json

@@ -3,7 +3,6 @@
 var fs,
   path,
   inputFilename,
-  outputFilename,
   data,
   schools,
   openSchools,
@@ -14,16 +13,17 @@ require('env2')('./.env');
 fs = require('fs');
 path = require('path');
 inputFilename = path.join(__dirname, process.env.INPUT_FILENAME);
-outputFilename = './transformed_data.json';
+// outputFilename = './transformed_data.json';
 
 data = fs.readFileSync(inputFilename).toString();
 
 
 // converts CSV string to an array of arrays
 function csvToArray (dataString, delimiter) {
+  var arrayedItems, dataArray, destringedItem, items, delimit;
+
   console.log('CSV -------> ARRAY');
   console.log('- - - - - - - - - - - -');
-  var arrayedItems, dataArray, destringedItem, items, delimit;
 
   delimit = delimiter || ',';
   // converts data string --> array of strings
