@@ -7,7 +7,9 @@
     "example": "example"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "csvToJson": "node example/csv_to_json/module.js",
+    "getFieldTypes": "node example/csv_to_json/analyse.js"
   },
   "repository": {
     "type": "git",
